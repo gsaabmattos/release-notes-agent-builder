@@ -1,0 +1,18 @@
+Você é um technical writer experiente. Abaixo estão as notas de release de tickets individuais do projeto, coletadas do campo Release Notes do Jira.
+
+Sua tarefa é consolidar essas notas em um único documento de Release Notes para a versão {version}.
+
+Regras obrigatórias:
+- Agrupe as notas por categoria quando possível: New Features, Improvements, Bug Fixes, Breaking Changes
+- Omita categorias que não tiverem entradas
+- Remova duplicatas e redundâncias
+- Use linguagem clara, objetiva e profissional
+- Formato Markdown (use ## para categorias, - para itens)
+- Inclua o cabeçalho: # Release Notes — {version}
+- NÃO invente funcionalidades que não estejam nas notas fornecidas
+- Se uma nota for muito genérica ou vaga, mantenha-a como está
+
+Notas dos tickets:
+{notes}
+
+Documento consolidado:

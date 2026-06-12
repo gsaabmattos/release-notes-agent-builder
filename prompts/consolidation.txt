@@ -1,18 +1,32 @@
-Você é um technical writer experiente. Abaixo estão as notas de release de tickets individuais do projeto, coletadas do campo Release Notes do Jira.
+You are a technical writer. Your only task is to reformat the ticket notes below into the exact document structure shown in the example. Do not add sections, summaries, or content that is not in the notes.
 
-Sua tarefa é consolidar essas notas em um único documento de Release Notes para a versão {version}.
+TARGET FORMAT (follow exactly):
+---
+# Release Notes — {version}
 
-Regras obrigatórias:
-- Agrupe as notas por categoria quando possível: New Features, Improvements, Bug Fixes, Breaking Changes
-- Omita categorias que não tiverem entradas
-- Remova duplicatas e redundâncias
-- Use linguagem clara, objetiva e profissional
-- Formato Markdown (use ## para categorias, - para itens)
-- Inclua o cabeçalho: # Release Notes — {version}
-- NÃO invente funcionalidades que não estejam nas notas fornecidas
-- Se uma nota for muito genérica ou vaga, mantenha-a como está
+## Enhancements
+### Parent Feature Name
+#### Ticket title
+    - Include the exat content of the field "Release Notes" 
+#### Ticket title
+    - Include the exat content of the field "Release Notes" 
 
-Notas dos tickets:
+## Bug Fixes
+### Parent Feature Name
+    - Include the exat content of the field "Release Notes"---
+
+RULES:
+- Output ONLY the markdown document. No preamble, no closing remarks, no summary section.
+- Use ## Enhancements for all ticket types that are "Story"".
+- Use ## Bug Fixes for all ticket types that are "Issue".
+- Omit a section entirely if there are no entries for it.
+- Group items under ### using the parent ticket name provided. If no parent, use ### Other.
+- Each bullet point is ONE sentence. No sub-bullets, no Feature/Issue/Fix breakdown.
+- Do not repeat information already covered by another bullet.
+- Do not invent or assume any information not present in the notes.
+- Write in the same language as the notes (English or Portuguese).
+
+TICKET NOTES (grouped by parent):
 {notes}
 
-Documento consolidado:
+OUTPUT (markdown only, starting with # Release Notes):

@@ -33,7 +33,9 @@ class LLMConsolidator:
         self.llm = OllamaLLM(
             base_url=cfg.ollama_base_url,
             model=cfg.ollama_model,
-            temperature=0.2,
+            temperature=cfg.ollama_temperature,
+            top_p=cfg.ollama_top_p,
+            repeat_penalty=cfg.ollama_repeat_penalty,
         )
         self.prompt_template = self._load_prompt()
         self.chain = PromptTemplate.from_template(self.prompt_template) | self.llm
@@ -56,10 +58,24 @@ class LLMConsolidator:
                 f"Nenhuma nota de release encontrada para esta versão.\n"
             )
 
-        notes_text = "\n\n".join(
-            f"[{n['key']}] {n['summary']}\n{n['notes']}"
-            for n in notes
-        )
+        groups: dict[str, list[dict]] = {}
+        for n in notes:
+            group_label = (
+                f"{n['parent_key']} — {n['parent_summary']}"
+                if n.get("parent_key")
+                else "Sem parent"
+            )
+            groups.setdefault(group_label, []).append(n)
+
+        sections = []
+        for group_label, group_notes in groups.items():
+            items = "\n".join(
+                f"  [{n['key']}] ({n['issuetype']}) {n['summary']}\n  {n['notes']}"
+                for n in group_notes
+            )
+            sections.append(f"### {group_label}\n{items}")
+
+        notes_text = "\n\n".join(sections)
 
         log.info(f"Enviando {len(notes)} nota(s) para consolidação via LLM ({self.llm.model})...")
         result = self.chain.invoke({"version": version, "notes": notes_text})

@@ -75,7 +75,7 @@ query GetPage($path: String!, $locale: String!) {
 
 class WikiJSPublisher:
     def __init__(self, cfg):
-        self.graphql_url = f"{cfg.wikijs_url}/graphql"
+        self.graphql_url = f"{cfg.wikijs_url.rstrip('/')}/graphql"
         self.headers = {
             "Authorization": f"Bearer {cfg.wikijs_api_token}",
             "Content-Type": "application/json",

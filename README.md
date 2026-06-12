@@ -1,74 +1,74 @@
 # Release Notes Agent
 
-Agente local que coleta tickets DONE do Jira, extrai o campo "Release Notes" e publica um documento consolidado no Wiki.js via LLM local (Ollama).
+A local agent that collects DONE tickets from Jira, extracts the "Release Notes" field, and publishes a consolidated document to Wiki.js using a local LLM (Ollama).
 
-## Pré-requisitos
+## Prerequisites
 
 - Python 3.11+
-- [Ollama](https://ollama.com) instalado e rodando
-- Acesso ao Jira Cloud (API Token)
-- Wiki.js rodando localmente com API habilitada
+- [Ollama](https://ollama.com) installed and running
+- Jira Cloud access (API Token)
+- Wiki.js running with the API enabled
 
-## Instalação rápida
+## Quick Setup
 
 ```bash
-# 1. Instalar Ollama e o modelo
+# 1. Install Ollama and the model
 curl -fsSL https://ollama.com/install.sh | sh
 ollama pull qwen2.5:7b
 
-# 2. Criar ambiente virtual
+# 2. Create a virtual environment
 python3 -m venv venv
 source venv/bin/activate
 
-# 3. Instalar dependências
+# 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Configurar credenciais
+# 4. Configure credentials
 cp .env.example .env
-nano .env   # preencher com suas credenciais
+nano .env   # fill in your credentials
 
-# 5. Validações iniciais
+# 5. Initial validation
 python scripts/test_jira.py
-python scripts/discover_field.py   # anote o ID e atualize modules/notes_extractor.py
+python scripts/discover_field.py   # note the field ID and update modules/notes_extractor.py
 python scripts/test_wikijs.py
 ```
 
-## Uso
+## Usage
 
 ```bash
 source venv/bin/activate
 
-# Versão específica
+# Specific version
 python agent.py --version "1.4.2"
 
-# Última versão Released no Jira
+# Latest Released version in Jira
 python agent.py --version latest
 
-# Tickets DONE sem fixVersion
+# DONE tickets with no fixVersion
 python agent.py --version unreleased
 
-# Forçar reprocessamento
+# Force reprocessing even without detected changes
 python agent.py --version "1.4.2" --force
 ```
 
-## Agendamento (cron)
+## Scheduling (cron)
 
 ```bash
 crontab -e
 ```
 
-Adicionar (exemplo: toda segunda-feira às 09h):
+Add an entry (example: every Monday at 9am):
 
 ```
-0 9 * * 1 /caminho/para/venv/bin/python /caminho/para/agent.py --version latest >> /caminho/para/logs/cron.log 2>&1
+0 9 * * 1 /path/to/venv/bin/python /path/to/agent.py --version latest >> /path/to/logs/cron.log 2>&1
 ```
 
-## Estrutura
+## Project Structure
 
 ```
 release-notes-agent/
-├── agent.py                  # Entrypoint principal
-├── .env                      # Credenciais (não versionar)
+├── agent.py                  # Main entrypoint
+├── .env                      # Credentials (do not commit)
 ├── .env.example              # Template
 ├── requirements.txt
 ├── config/
@@ -81,23 +81,23 @@ release-notes-agent/
 │   ├── wikijs_publisher.py
 │   └── state_manager.py
 ├── prompts/
-│   └── consolidation.txt     # Prompt customizável para o LLM
+│   └── consolidation.txt     # Customizable LLM prompt
 ├── scripts/
-│   ├── discover_field.py     # Descobre ID do campo Release Notes
-│   ├── test_jira.py          # Valida conexão Jira
-│   └── test_wikijs.py        # Valida conexão Wiki.js
-├── state/                    # Estado por versão (gitignored)
-├── output/                   # Backup local dos documentos (gitignored)
-└── logs/                     # Logs de execução (gitignored)
+│   ├── discover_field.py     # Discovers the Release Notes field ID
+│   ├── test_jira.py          # Validates Jira connection
+│   └── test_wikijs.py        # Validates Wiki.js connection
+├── state/                    # Per-version state (gitignored)
+├── output/                   # Local document backups (gitignored)
+└── logs/                     # Execution logs (gitignored)
 ```
 
-## Primeiro uso: descobrir o campo Release Notes
+## First Run: Discovering the Release Notes Field
 
-O ID do campo customizado "Release Notes" varia por instância Jira. Execute:
+The custom field ID for "Release Notes" varies per Jira instance. Run:
 
 ```bash
 python scripts/discover_field.py
 ```
 
-Anote o ID retornado (ex: `customfield_10058`) e atualize a constante
-`RELEASE_NOTES_FIELD` no arquivo `modules/notes_extractor.py`.
+Note the returned ID (e.g. `customfield_10058`) and update the `RELEASE_NOTES_FIELD`
+constant in `modules/notes_extractor.py`.

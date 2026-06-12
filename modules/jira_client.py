@@ -21,7 +21,7 @@ class JiraClient:
             f'AND status = Done '
             f'ORDER BY updated DESC'
         )
-        fields = "summary,status,fixVersions,updated,customfield_release_notes"
+        fields = "*all"
         log.info(f"JQL: {jql}")
         issues = self.client.jql(jql, fields=fields, limit=500)
         return issues.get("issues", [])
@@ -34,7 +34,7 @@ class JiraClient:
             f'AND fixVersion is EMPTY '
             f'ORDER BY updated DESC'
         )
-        fields = "summary,status,fixVersions,updated,customfield_release_notes"
+        fields = "*all"
         issues = self.client.jql(jql, fields=fields, limit=500)
         return issues.get("issues", [])
 

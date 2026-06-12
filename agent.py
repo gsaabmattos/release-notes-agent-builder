@@ -32,6 +32,10 @@ def main():
         "--force", action="store_true",
         help="Reprocessa mesmo sem alterações detectadas"
     )
+    parser.add_argument(
+        "--dry-run", action="store_true",
+        help="Gera o documento localmente sem publicar no Wiki.js"
+    )
     args = parser.parse_args()
 
     cfg = Settings()
@@ -63,7 +67,12 @@ def main():
         f.write(document)
     log.info(f"Backup local salvo em {output_path}")
 
-    page_path = f"{cfg.wikijs_base_path}/{version_name}"
+    if args.dry_run:
+        log.info(f"Dry-run: documento salvo em {output_path}, publicação ignorada.")
+        return
+
+    safe_version = version_name.replace(".", "-")
+    page_path = f"{cfg.wikijs_base_path.strip('/')}/{safe_version}"
     publisher.publish(page_path, version_name, document)
     state.save(version_name, tickets)
     log.info(f"Publicado em {cfg.wikijs_url}{page_path}")

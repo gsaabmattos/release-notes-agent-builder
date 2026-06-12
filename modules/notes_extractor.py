@@ -5,7 +5,7 @@ log = logging.getLogger(__name__)
 # ID do campo customizado "Release Notes" no seu Jira.
 # Execute o script de descoberta (seção 7.4 do documento) para confirmar.
 # Exemplo: customfield_10058
-RELEASE_NOTES_FIELD = "customfield_release_notes"
+RELEASE_NOTES_FIELD = "customfield_10066"
 
 
 class NotesExtractor:
@@ -40,9 +40,16 @@ class NotesExtractor:
                 skipped += 1
                 continue
 
+            parent = fields.get("parent", {})
+            parent_key = parent.get("key", "")
+            parent_summary = parent.get("fields", {}).get("summary", "")
+
             results.append({
                 "key": ticket["key"],
                 "summary": fields.get("summary", ""),
+                "issuetype": fields.get("issuetype", {}).get("name", "Task"),
+                "parent_key": parent_key,
+                "parent_summary": parent_summary,
                 "notes": note_text,
                 "updated": fields.get("updated", "")
             })

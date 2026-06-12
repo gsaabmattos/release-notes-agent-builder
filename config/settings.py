@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     # Ollama
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "qwen2.5:7b"
+    ollama_temperature: float = 0.1
+    ollama_top_p: float = 0.8
+    ollama_repeat_penalty: float = 1.2
 
     # Wiki.js
     wikijs_url: str

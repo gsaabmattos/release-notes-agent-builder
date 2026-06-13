@@ -39,7 +39,7 @@ python scripts/test_wikijs.py
 source venv/bin/activate
 
 # Specific version
-python agent.py --version "1.4.2"
+python agent.py --version POS-2.24.0
 
 # Latest Released version in Jira
 python agent.py --version latest
@@ -48,7 +48,11 @@ python agent.py --version latest
 python agent.py --version unreleased
 
 # Force reprocessing even without detected changes
-python agent.py --version "1.4.2" --force
+python agent.py --version POS-2.24.0 --force
+
+# Post the generated RN in a .md file to validate locally before sending to the Doc POrtal
+python agent.py --version POS-2.24.0 --dry-run --force
+
 ```
 
 ## Scheduling (cron)

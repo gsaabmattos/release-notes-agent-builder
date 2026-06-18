@@ -5,15 +5,19 @@ TARGET FORMAT (follow exactly):
 # Release Notes — {version}
 
 ## Enhancements
-### Parent Feature Name ("Parent Summary" field of JIRA)
+### Parent Feature Name ("Parent" field of JIRA)
 #### Ticket title (Summary field of JIRA)
     - Include the exat content of the field Jira field Custom Field (Release Notes)
 #### Ticket title
-    - Include the exat content of the field "Custom Field (Release Notes)" 
+    - Include the exat content of the field "Custom Field (Release Notes)"
 
 ## Bug Fixes
-### Parent Feature Name
+### Parent Feature Name ("Parent" field of JIRA)
     - Include the exat content of the field "Custom Field (Release Notes)"---
+#### Ticket title (Summary field of JIRA)
+    - Include the exat content of the field Jira field Custom Field (Release Notes)
+#### Ticket title
+    - Include the exat content of the field "Custom Field (Release Notes)"
 
 RULES:
 - Output ONLY the markdown document. No preamble, no closing remarks, no summary section.

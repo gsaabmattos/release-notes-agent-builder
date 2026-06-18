@@ -15,11 +15,10 @@ class Settings(BaseSettings):
     ollama_top_p: float = 0.8
     ollama_repeat_penalty: float = 1.2
 
-    # Wiki.js
-    wikijs_url: str
-    wikijs_api_token: str
-    wikijs_base_path: str = "/releases"
-    wikijs_locale: str = "pt"
+    # Outline
+    outline_url: str
+    outline_api_token: str
+    outline_collection_id: str
 
     # Agente
     log_level: str = "INFO"

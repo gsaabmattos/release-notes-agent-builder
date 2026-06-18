@@ -2,7 +2,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
-BUG_TYPES = {"bug", "defect"}
+BUG_TYPES = {"bug", "defect", "issue"}
 
 
 class LLMConsolidator:
@@ -20,7 +20,9 @@ class LLMConsolidator:
         enhancements: dict[str, list[dict]] = {}
         bug_fixes: dict[str, list[dict]] = {}
 
+        seen_types: set[str] = set()
         for n in notes:
+            seen_types.add(n.get("issuetype", "unknown"))
             parent = (
                 f"{n['parent_key']} — {n['parent_summary']}"
                 if n.get("parent_key")
@@ -28,6 +30,7 @@ class LLMConsolidator:
             )
             bucket = bug_fixes if n.get("issuetype", "").lower() in BUG_TYPES else enhancements
             bucket.setdefault(parent, []).append(n)
+        log.info(f"Tipos de issue encontrados: {seen_types}")
 
         lines = [f"# Release Notes — {version}", ""]
 

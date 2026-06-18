@@ -14,6 +14,12 @@ class JiraClient:
         )
         self.project = cfg.jira_project_key
 
+    def _fetch_all(self, jql: str) -> list[dict]:
+        log.info(f"JQL: {jql}")
+        issues = self.client.enhanced_jql_get_list_of_tickets(jql, fields="*all")
+        log.info(f"{len(issues)} tickets encontrados")
+        return issues
+
     def get_done_tickets_by_version(self, version_name: str) -> list[dict]:
         jql = (
             f'project = "{self.project}" '
@@ -21,22 +27,16 @@ class JiraClient:
             f'AND status = Done '
             f'ORDER BY updated DESC'
         )
-        fields = "*all"
-        log.info(f"JQL: {jql}")
-        issues = self.client.jql(jql, fields=fields, limit=500)
-        return issues.get("issues", [])
+        return self._fetch_all(jql)
 
     def get_all_done_tickets(self) -> list[dict]:
-        """Busca todos os tickets DONE sem filtro de versão (modo 'unreleased')."""
         jql = (
             f'project = "{self.project}" '
             f'AND status = Done '
             f'AND fixVersion is EMPTY '
             f'ORDER BY updated DESC'
         )
-        fields = "*all"
-        issues = self.client.jql(jql, fields=fields, limit=500)
-        return issues.get("issues", [])
+        return self._fetch_all(jql)
 
     def get_latest_released_version(self) -> str:
         versions = self.client.get_project_versions(self.project)

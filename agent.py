@@ -6,7 +6,7 @@ from modules.version_resolver import VersionResolver
 from modules.jira_client import JiraClient
 from modules.notes_extractor import NotesExtractor
 from modules.llm_consolidator import LLMConsolidator
-from modules.wikijs_publisher import WikiJSPublisher
+from modules.outline_publisher import OutlinePublisher
 from modules.state_manager import StateManager
 
 os.makedirs("logs", exist_ok=True)
@@ -43,7 +43,7 @@ def main():
     resolver = VersionResolver(jira, cfg)
     extractor = NotesExtractor(jira, cfg)
     consolidator = LLMConsolidator(cfg)
-    publisher = WikiJSPublisher(cfg)
+    publisher = OutlinePublisher(cfg)
     state = StateManager(cfg)
 
     version_name = resolver.resolve(args.version)
@@ -71,11 +71,9 @@ def main():
         log.info(f"Dry-run: documento salvo em {output_path}, publicação ignorada.")
         return
 
-    safe_version = version_name.replace(".", "-")
-    page_path = f"{cfg.wikijs_base_path.strip('/')}/{safe_version}"
-    publisher.publish(page_path, version_name, document)
+    publisher.publish(version_name, document)
     state.save(version_name, tickets)
-    log.info(f"Publicado em {cfg.wikijs_url}{page_path}")
+    log.info(f"Publicado no Outline: {version_name}")
 
 
 if __name__ == "__main__":

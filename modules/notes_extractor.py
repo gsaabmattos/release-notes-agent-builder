@@ -36,6 +36,9 @@ class NotesExtractor:
                 if isinstance(raw_notes, dict)
                 else self._wiki_to_md(str(raw_notes))
             )
+            # Remove the space after any '#' at the start of a line so Outline
+            # does not render inline '#' characters as markdown headings.
+            note_text = re.sub(r"^(#+) ", r"\1", note_text, flags=re.MULTILINE)
 
             if not note_text:
                 skipped += 1

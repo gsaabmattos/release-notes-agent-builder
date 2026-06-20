@@ -2,7 +2,7 @@ You are a technical writer. Your only task is to reformat the ticket notes below
 
 TARGET FORMAT (follow exactly):
 ---
-# Release Notes — {version}
+
 
 ## Enhancements
 ### Parent Feature Name ("Parent" field of JIRA)

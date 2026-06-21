@@ -90,9 +90,10 @@ class NotesExtractor:
             inner = "".join(self._adf_to_md(c) for c in content)
             return "#" * level + " " + inner.strip() + "\n\n"
 
-        if t == "blockquote":
+        if t in ("blockquote", "panel"):
             inner = "".join(self._adf_to_md(c) for c in content).strip()
-            return "\n".join(f"> {line}" for line in inner.splitlines()) + "\n\n"
+            quoted = "\n".join(f"> {line}" for line in inner.splitlines())
+            return "\n\n" + quoted + "\n\n"
 
         if t == "codeBlock":
             lang = attrs.get("language", "")
@@ -232,11 +233,15 @@ class NotesExtractor:
             text, flags=re.DOTALL,
         )
 
-        # 3. Panels → blockquote (NOTE / WARNING / INFO boxes)
+        # 3. Panels → blockquote (NOTE / WARNING / INFO boxes).
+        # Double newlines around the blockquote are required: a single trailing \n
+        # causes the next paragraph to be a CommonMark lazy continuation of the
+        # blockquote, making all subsequent text appear inside the highlight box.
         def replace_panel(m):
             lines = m.group(1).strip().splitlines()
-            return "\n" + "\n".join(f"> {l}" for l in lines) + "\n"
+            return "\n\n" + "\n".join(f"> {l}" for l in lines) + "\n\n"
         text = re.sub(r"\{panel[^}]*\}(.*?)\{panel\}", replace_panel, text, flags=re.DOTALL)
+        text = re.sub(r"\{(?:info|note|warning|tip)\}(.*?)\{(?:info|note|warning|tip)\}", replace_panel, text, flags=re.DOTALL)
 
         # 4. Inline monospace: {{text}} → `text`
         text = re.sub(r"\{\{([^}]+)\}\}", r"`\1`", text)

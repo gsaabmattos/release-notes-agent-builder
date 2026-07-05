@@ -1,8 +1,8 @@
 <img width="1916" height="1440" alt="RN_Arch" src="https://github.com/user-attachments/assets/b09e2ce6-026f-45ae-9408-106850f04d9b" />
 
-Release Notes Agent — how it works
+##Release Notes Agent Builder — how it works
 
-The agent is a command-line tool (agent.py) that, for a given Jira fix version (or several combined), pulls every "Done" ticket, extracts its Release Notes field, rehosts any embedded images so they don't break, assembles everything into one document, and publishes it to Outline. Each step is owned by a small, single-purpose module:
+The agent-builder is a command-line tool (agent.py) that, for a given Jira fix version (or several combined), pulls every "Done" ticket, extracts its Release Notes field, rehosts any embedded images so they don't break, assembles everything into one document, and publishes it to Outline. Each step is owned by a small, single-purpose module:
 
 JiraClient — the only module that talks to Jira. Runs the JQL queries that fetch "Done" tickets for a version (or with no fix version, for the unreleased mode), looks up released versions, and downloads image bytes from Jira attachment/media URLs using the authenticated session.
 
@@ -20,11 +20,6 @@ StateManager — keeps a per-version JSON snapshot of each ticket's updated time
 
 agent.py — the orchestrator. Wires all of the above together for a single run: resolve version(s) → fetch tickets → extract notes → build the document → relocate images → publish → save state.
 
-
-
-# Release Notes Agent
-
-A local agent that collects DONE tickets from Jira, extracts the "Release Notes" field, and publishes a consolidated document — with images rehosted from Jira — to Outline.
 
 ## Prerequisites
 

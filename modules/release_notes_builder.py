@@ -11,7 +11,7 @@ def _version_sort_key(version: str) -> tuple:
     return tuple(int(n) for n in re.findall(r"\d+", version))
 
 
-class LLMConsolidator:
+class ReleaseNotesBuilder:
     def __init__(self, cfg):
         pass
 

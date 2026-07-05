@@ -6,7 +6,7 @@ from config.settings import Settings
 from modules.version_resolver import VersionResolver
 from modules.jira_client import JiraClient
 from modules.notes_extractor import NotesExtractor
-from modules.llm_consolidator import LLMConsolidator, _version_sort_key
+from modules.release_notes_builder import ReleaseNotesBuilder, _version_sort_key
 from modules.outline_publisher import OutlinePublisher
 from modules.image_relocator import ImageRelocator
 from modules.state_manager import StateManager
@@ -55,7 +55,7 @@ def main():
     jira = JiraClient(cfg)
     resolver = VersionResolver(jira, cfg)
     extractor = NotesExtractor(jira, cfg)
-    consolidator = LLMConsolidator(cfg)
+    builder = ReleaseNotesBuilder(cfg)
     publisher = OutlinePublisher(cfg)
     relocator = ImageRelocator(jira, publisher)
     state = StateManager(cfg)
@@ -83,7 +83,7 @@ def main():
         log.info("Nenhuma alteração detectada. Encerrando.")
         return
 
-    document = consolidator.consolidate_multi(versions_notes)
+    document = builder.consolidate_multi(versions_notes)
 
     # Output file named after the primary (semantically lowest) version
     primary = min((vn for vn, _ in versions_notes), key=_version_sort_key)

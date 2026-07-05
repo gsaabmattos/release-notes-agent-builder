@@ -1,5 +1,18 @@
+##High-level architecture​​ (including JIRA AI Agent)
+
+In JIRA, when the ticket goes from QA IN PROGRESS to DOC TO DO, a JIRA automation will request a JIRA AI Agent called "Release Notes Generator" to generate the release notes for the ticket.
+Since it is an obligation for all tickets to pass through the status DOC TO DO, all of them will have the release notes automatically generated. At this point, someone can review its content and then pass the ticket to DONE. 
+Then, when invoking agent.py, all tickets will be consolidated in a single document and published to OUTLINE.
+
 <img width="1916" height="1650" alt="image" src="https://github.com/user-attachments/assets/bb535313-e2a3-4742-a56c-a9e1635ef655" />
 
+Color key:
+
+Coral — the Jira/Outline domain: ticket statuses on the left, and the Outline destination on the right
+Pink — the automated AI step: the Jira automation rule and the "Release Notes Generator" agent it invokes
+Purple — core agent.py pipeline modules
+Gray — auxiliary/support modules (VersionResolver, StateManager)
+Teal — ImageRelocator, the image-rehosting feature
 
 ##Release Notes Agent Builder — how it works
 

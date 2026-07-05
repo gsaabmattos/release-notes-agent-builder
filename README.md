@@ -17,7 +17,13 @@ curl -fsSL https://ollama.com/install.sh | sh
 ollama pull qwen2.5:7b
 
 # 2. Create a virtual environment
-python3 -m venv venv
+# If you don't have Python 3.11 installed, install it (Homebrew):
+#
+# ```bash
+# brew install python@3.11
+# ```
+
+python3.11 -m venv venv
 source venv/bin/activate
 
 # 3. Install dependencies

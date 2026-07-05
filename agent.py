@@ -1,3 +1,4 @@
+import sys
 import argparse
 import logging
 import os
@@ -8,6 +9,14 @@ from modules.notes_extractor import NotesExtractor
 from modules.llm_consolidator import LLMConsolidator, _version_sort_key
 from modules.outline_publisher import OutlinePublisher
 from modules.state_manager import StateManager
+
+if sys.version_info < (3, 11):
+    sys.stderr.write(
+        f"Release Notes Agent requires Python 3.11+.\n"
+        f"Current interpreter: {sys.version.split()[0]}\n"
+        "Please recreate the virtual environment with Python 3.11 or newer.\n"
+    )
+    sys.exit(1)
 
 os.makedirs("logs", exist_ok=True)
 

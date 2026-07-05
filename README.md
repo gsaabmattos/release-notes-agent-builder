@@ -1,4 +1,5 @@
-<img width="1916" height="1440" alt="RN_Arch" src="https://github.com/user-attachments/assets/b09e2ce6-026f-45ae-9408-106850f04d9b" />
+<img width="1916" height="1650" alt="image" src="https://github.com/user-attachments/assets/bb535313-e2a3-4742-a56c-a9e1635ef655" />
+
 
 ##Release Notes Agent Builder — how it works
 

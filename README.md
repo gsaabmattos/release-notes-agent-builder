@@ -1,3 +1,5 @@
+<img width="1916" height="1440" alt="RN_Arch" src="https://github.com/user-attachments/assets/b09e2ce6-026f-45ae-9408-106850f04d9b" />
+
 Release Notes Agent — how it works
 
 The agent is a command-line tool (agent.py) that, for a given Jira fix version (or several combined), pulls every "Done" ticket, extracts its Release Notes field, rehosts any embedded images so they don't break, assembles everything into one document, and publishes it to Outline. Each step is owned by a small, single-purpose module:

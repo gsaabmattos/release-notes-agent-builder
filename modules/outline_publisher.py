@@ -7,7 +7,8 @@ log = logging.getLogger(__name__)
 
 class OutlinePublisher:
     def __init__(self, cfg):
-        self.api_url = cfg.outline_url.rstrip("/") + "/api"
+        self.base_url = cfg.outline_url.rstrip("/")
+        self.api_url = self.base_url + "/api"
         self.headers = {
             "Authorization": f"Bearer {cfg.outline_api_token}",
             "Content-Type": "application/json",
@@ -38,6 +39,37 @@ class OutlinePublisher:
         except Exception as exc:
             log.warning(f"Busca no Outline falhou: {exc}")
         return None
+
+    def upload_image(self, filename: str, content: bytes, content_type: str) -> str | None:
+        """Upload raw image bytes as an Outline attachment, returning its hosted URL."""
+        try:
+            created = self._post("attachments.create", {
+                "name": filename,
+                "contentType": content_type,
+                "size": len(content),
+            })
+            data = created.get("data", {})
+            attachment_url = data.get("attachment", {}).get("url")
+
+            with httpx.Client(timeout=60) as client:
+                if data.get("mode") == "put":
+                    response = client.put(
+                        data["url"], content=content, headers=data.get("headers", {})
+                    )
+                else:
+                    response = client.post(
+                        data["uploadUrl"],
+                        data=data.get("form", {}),
+                        files={"file": (filename, content, content_type)},
+                    )
+                response.raise_for_status()
+
+            if attachment_url and attachment_url.startswith("/"):
+                attachment_url = self.base_url + attachment_url
+            return attachment_url
+        except Exception as exc:
+            log.warning(f"Falha ao enviar imagem '{filename}' para o Outline: {exc}")
+            return None
 
     def publish(self, version: str, content: str):
         title = f"Release Notes — {version}"

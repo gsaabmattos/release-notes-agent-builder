@@ -8,6 +8,7 @@ from modules.jira_client import JiraClient
 from modules.notes_extractor import NotesExtractor
 from modules.llm_consolidator import LLMConsolidator, _version_sort_key
 from modules.outline_publisher import OutlinePublisher
+from modules.image_relocator import ImageRelocator
 from modules.state_manager import StateManager
 
 if sys.version_info < (3, 11):
@@ -56,6 +57,7 @@ def main():
     extractor = NotesExtractor(jira, cfg)
     consolidator = LLMConsolidator(cfg)
     publisher = OutlinePublisher(cfg)
+    relocator = ImageRelocator(jira, publisher)
     state = StateManager(cfg)
 
     versions_notes: list[tuple[str, list[dict]]] = []
@@ -87,13 +89,17 @@ def main():
     primary = min((vn for vn, _ in versions_notes), key=_version_sort_key)
     os.makedirs(cfg.output_dir, exist_ok=True)
     output_path = f"{cfg.output_dir}/{primary.replace('/', '_')}.md"
+
+    if args.dry_run:
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(document)
+        log.info(f"Dry-run: documento salvo em {output_path}, publicação ignorada.")
+        return
+
+    document = relocator.relocate(document)
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(document)
     log.info(f"Backup local salvo em {output_path}")
-
-    if args.dry_run:
-        log.info(f"Dry-run: documento salvo em {output_path}, publicação ignorada.")
-        return
 
     publisher.publish(primary, document)
     for version_name, tickets in all_tickets.items():

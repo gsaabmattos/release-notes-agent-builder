@@ -13,6 +13,8 @@ class NotesExtractor:
     def __init__(self, jira_client, cfg):
         self.jira = jira_client
         self.cfg = cfg
+        self._attachments_by_filename: dict[str, str] = {}
+        self._attachments_by_id: dict[str, str] = {}
 
     def get_done_tickets(self, version_name: str) -> list[dict]:
         if version_name == "unreleased":
@@ -30,6 +32,14 @@ class NotesExtractor:
                 skipped += 1
                 log.debug(f"Ticket {ticket['key']}: campo Release Notes vazio, ignorado")
                 continue
+
+            attachments = fields.get("attachment", [])
+            self._attachments_by_filename = {
+                a["filename"]: a.get("content", "") for a in attachments if a.get("filename")
+            }
+            self._attachments_by_id = {
+                str(a["id"]): a.get("content", "") for a in attachments if a.get("id")
+            }
 
             note_text = (
                 self._parse_adf(raw_notes)
@@ -94,6 +104,18 @@ class NotesExtractor:
             inner = "".join(self._adf_to_md(c) for c in content).strip()
             quoted = "\n".join(f"> {line}" for line in inner.splitlines())
             return "\n\n" + quoted + "\n\n"
+
+        if t == "mediaSingle":
+            return "".join(self._adf_to_md(c) for c in content) + "\n\n"
+
+        if t == "media":
+            media_id = str(attrs.get("id", ""))
+            url = self._attachments_by_id.get(media_id)
+            if not url:
+                log.debug(f"Mídia '{media_id}' referenciada mas não encontrada nos anexos do ticket")
+                return ""
+            alt = attrs.get("alt") or "image"
+            return f"![{alt}]({url})"
 
         if t == "codeBlock":
             lang = attrs.get("language", "")
@@ -246,8 +268,16 @@ class NotesExtractor:
         # 4. Inline monospace: {{text}} → `text`
         text = re.sub(r"\{\{([^}]+)\}\}", r"`\1`", text)
 
-        # 5. Images — remove entirely (binary assets don't transfer to Outline)
-        text = re.sub(r"!(?:[^!\n|]+)(?:\|[^!]*)?\!", "", text)
+        # 5. Images: !filename.png|attrs! -> ![filename.png](content-url), resolved
+        # against the ticket's real attachments so they can be re-hosted later.
+        def replace_image(m):
+            filename = m.group(1).split("|")[0].strip()
+            url = self._attachments_by_filename.get(filename)
+            if not url:
+                log.debug(f"Imagem '{filename}' referenciada mas não encontrada nos anexos do ticket")
+                return ""
+            return f"![{filename}]({url})"
+        text = re.sub(r"!([^!\n|]+(?:\|[^!\n]*)?)!", replace_image, text)
 
         # 6. Headings: h1. → # … h6. → ######
         for lvl in range(6, 0, -1):

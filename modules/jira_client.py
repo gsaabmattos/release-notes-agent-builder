@@ -1,4 +1,7 @@
 import logging
+from urllib.parse import urlparse
+
+import httpx
 from atlassian import Jira
 
 log = logging.getLogger(__name__)
@@ -49,6 +52,25 @@ class JiraClient:
 
     def get_all_versions(self) -> list[dict]:
         return self.client.get_project_versions(self.project)
+
+    def download_attachment(self, url: str) -> tuple[bytes, str] | None:
+        """Download an image referenced from a release-notes field.
+
+        Only sends Jira credentials to the Jira host itself — Atlassian's
+        media API URLs already carry a signed token in the query string, and
+        forwarding Basic auth to a third-party host would leak it.
+        """
+        same_host = urlparse(url).netloc == urlparse(self.client.url).netloc
+        auth = (self.client.username, self.client.password) if same_host else None
+        try:
+            with httpx.Client(timeout=30, follow_redirects=True) as client:
+                response = client.get(url, auth=auth)
+                response.raise_for_status()
+                content_type = response.headers.get("content-type", "application/octet-stream")
+                return response.content, content_type
+        except Exception as exc:
+            log.warning(f"Falha ao baixar imagem do Jira ({url}): {exc}")
+            return None
 
     def discover_release_notes_field(self) -> str | None:
         """Descobre o ID do campo customizado 'Release Notes'."""
